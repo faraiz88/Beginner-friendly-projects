@@ -1,13 +1,15 @@
 import json
 import os
 
-
 FILENAME = "lists.json"
+
+# Create file if it doesn't exist
 def save_file():
     if not os.path.exists(FILENAME):
         with open(FILENAME, "w") as f:
-            json.dump([], f, indent = 3)
+            json.dump([], f, indent=3)
 
+# Load tasks from file
 def load_file():
     with open(FILENAME, "r") as f:
         return json.load(f)
@@ -15,8 +17,12 @@ def load_file():
 save_file()
 tasks = load_file()
 
+def save_tasks():
+    with open(FILENAME, "w") as f:
+        json.dump(tasks, f, indent=3)
 
 def show_menu():
+    print("\n--- TO DO LIST ---")
     print("1. Add a new task")
     print("2. View all tasks")
     print("3. Mark a task as done")
@@ -34,20 +40,30 @@ while True:
             "Done": False
         }
         tasks.append(to_do_list)
-
+        save_tasks()
 
     elif choice == "2":
-        for t in enumerate(tasks):
+        if not tasks:
+            print("No tasks found.")
+        for i, t in enumerate(tasks, start=1):
             status = "✅" if t["Done"] else "❌"
+            print(f"{i}. {t['Task']} {status}")
 
     elif choice == "3":
-        mark = input("Task done? (y/n): ")
-        if mark == "y":
-            tasks[0]["Done"] = True
-        else:
-            tasks[0]["Done"] = False
+        num = int(input("Enter task number to mark as done: "))
+        if 1 <= num <= len(tasks):
+            tasks[num-1]["Done"] = True
+            save_tasks()
 
+    elif choice == "4":
+        num = int(input("Enter task number to delete: "))
+        if 1 <= num <= len(tasks):
+            tasks.pop(num-1)
+            save_tasks()
 
     elif choice == "5":
         print("Exiting....")
         break
+
+    else:
+        print("Invalid choice, try again!")
